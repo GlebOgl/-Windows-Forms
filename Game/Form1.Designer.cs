@@ -40,15 +40,40 @@ namespace Game
             ClientSize = new Size(
                 GameState.ElementSize * MapModel.MapWidth,
                 GameState.ElementSize * MapModel.MapHeight + GameState.ElementSize);
+            //var button = new Button
+            //{
+            //    Location = new Point(0,
+            //    GameState.ElementSize * MapModel.MapHeight),
+            //    Size = new Size(GameState.ElementSize * MapModel.MapWidth, GameState.ElementSize),
+            //    Text = "Пошаговый режим"
+            //};
+            //Controls.Add(button);
+            //for (var i = 0; i<MapModel.MapWidth;i++)
+            //    for (var j = 0; j<MapModel.MapHeight;j++)
+            //    {
+            //        var button = new Button
+            //        {
+            //            Location = new Point(GameState.ElementSize * j, GameState.ElementSize * i),
+            //            Size = new Size(GameState.ElementSize, GameState.ElementSize),
+            //            Image = 
+            //        };
+            //        Controls.Add(button);
+            //    };
             FormBorderStyle = FormBorderStyle.FixedDialog;
             if (imagesDirectory == null)
                 imagesDirectory = new DirectoryInfo("Images");
             foreach (var e in imagesDirectory.GetFiles("*.png"))
                 bitmaps[e.Name] = (Bitmap)Image.FromFile(e.FullName);
+            this.MouseDown += new MouseEventHandler(MouseClickOnCell);
             var timer = new Timer();
             timer.Interval = 15;
             timer.Tick += TimerTick;
             timer.Start();
+        }
+
+        private void MouseClickOnCell(object sender, MouseEventArgs e)
+        {
+            MapModel.PointClick = e.Location;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -82,6 +107,8 @@ namespace Game
                 e.Graphics.DrawImage(bitmaps[a.Structure.GetImageFileName()], a.Location);
             }
             e.Graphics.ResetTransform();
+            //e.Graphics.DrawString("sdas", new Font("Arial", 16), Brushes.Green, GameState.ElementSize * MapModel.MapWidth - GameState.ElementSize,
+            //    GameState.ElementSize * MapModel.MapHeight);
         }
 
         private void TimerTick(object sender, EventArgs args)

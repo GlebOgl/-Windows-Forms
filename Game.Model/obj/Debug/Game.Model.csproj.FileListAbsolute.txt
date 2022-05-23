@@ -1,6 +1,6 @@
 C:\Users\1\source\repos\Game\Game.Model\bin\Debug\Game.Model.dll
 C:\Users\1\source\repos\Game\Game.Model\bin\Debug\Game.Model.pdb
-C:\Users\1\source\repos\Game\Game.Model\obj\Debug\Game.Model.csproj.AssemblyReference.cache
 C:\Users\1\source\repos\Game\Game.Model\obj\Debug\Game.Model.csproj.CoreCompileInputs.cache
 C:\Users\1\source\repos\Game\Game.Model\obj\Debug\Game.Model.dll
 C:\Users\1\source\repos\Game\Game.Model\obj\Debug\Game.Model.pdb
+C:\Users\1\source\repos\Game\Game.Model\obj\Debug\Game.Model.csproj.AssemblyReference.cache

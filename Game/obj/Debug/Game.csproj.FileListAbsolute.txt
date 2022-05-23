@@ -1,0 +1,13 @@
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.csproj.AssemblyReference.cache
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.Properties.Resources.resources
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.csproj.GenerateResource.cache
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.csproj.CoreCompileInputs.cache
+C:\Users\1\source\repos\Game\Game\bin\Debug\Game.exe.config
+C:\Users\1\source\repos\Game\Game\bin\Debug\Game.exe
+C:\Users\1\source\repos\Game\Game\bin\Debug\Game.pdb
+C:\Users\1\source\repos\Game\Game\bin\Debug\Game.Model.dll
+C:\Users\1\source\repos\Game\Game\bin\Debug\Game.Model.pdb
+C:\Users\1\source\repos\Game\Game\obj\Debug\Map.Form1.resources
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.csproj.CopyComplete
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.exe
+C:\Users\1\source\repos\Game\Game\obj\Debug\Game.pdb

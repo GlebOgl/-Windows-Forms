@@ -8,6 +8,7 @@ namespace Game.Model
 {
     public interface IStructure
     {
+        void GetAttaced(int damage);
         string GetImageFileName();
         bool IsFreeCell();
         int GetDrawingPriority();

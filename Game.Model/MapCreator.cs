@@ -50,6 +50,8 @@ namespace Game.Model
                     return CreateStructureByTypeName("Wall");
                 case ' ':
                     return CreateStructureByTypeName("Empty");
+                case 'E':
+                    return CreateStructureByTypeName("Enemy");
                 default:
                     throw new Exception($"wrong character for ICreature {c}");
             }

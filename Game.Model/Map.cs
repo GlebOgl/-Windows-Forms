@@ -14,9 +14,10 @@ namespace Game.Model
         private const string mapWithPlayerWall = @"
 WWW W
 WWP W
-W W W
+W WEW
 WW WW";
         public static Cell[,] Map;
+        public static Point PointClick = new Point(-1,-1);
         public static int MapWidth => Map.GetLength(0);
         public static int MapHeight => Map.GetLength(1);
         public static Keys KeyPressed;
