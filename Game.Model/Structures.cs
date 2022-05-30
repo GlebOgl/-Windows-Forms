@@ -10,40 +10,25 @@ namespace Game.Model
 {
     class Player : IStructure
     {
-        public int Health = 100;
+        public Point Coordinates { get; set; }
+        public int Health = 20;
         public int Endurance = 5;
         public int Damage = 5;
+        public int WalkCost = 1;
+        public int AttackCost = 1;
         private Queue<Point> WayToCell = new Queue<Point>();
 
         public StructureCommand Act(int x, int y)
         {
+            if (Health <=0)
+                MapModel.Map[x, y].Structure = new Empty();
             var newX = MapModel.PointClick.X / GameState.ElementSize;
             var newY = MapModel.PointClick.Y / GameState.ElementSize;
-            if (WayToCell.Count != 0)
+            if (GameState.IsBattleModOn && GameState.IsPlayerTurn)
             {
-                var point = WayToCell.Dequeue();
-                return new StructureCommand { DeltaX = point.X - x, DeltaY = point.Y - y };
+                return BattleModAct(x, y, newX, newY);
             }
-            if (MapModel.PointClick != new Point(-1,-1))
-            {
-                MapModel.PointClick = new Point(-1, -1);
-                if (MapModel.Map[newX, newY].Structure != null && 
-                    MapModel.Map[newX, newY].Structure.GetImageFileName() == "Enemy.png")
-                {
-                    MapModel.Map[newX, newY].Structure.GetAttaced(Damage);
-                    return new StructureCommand { DeltaX = 0, DeltaY = 0 };
-                }
-                else if(MapModel.Map[newX, newY].Structure == null ||
-                    MapModel.Map[newX, newY].Structure.IsFreeCell())
-                {
-                    WayToCell = FindPaths(new Point(x, y), new Point[] { new Point(newX, newY) });
-                    if (WayToCell.Count == 0)
-                        return new StructureCommand { DeltaX = 0, DeltaY = 0 };
-                    var point = WayToCell.Dequeue();
-                    return new StructureCommand { DeltaX = point.X - x, DeltaY = point.Y - y };
-                }
-                
-            }
+            Endurance = 5;
             newX = x;
             newY = y;
             if (MapModel.KeyPressed == Keys.Up)
@@ -59,6 +44,54 @@ namespace Game.Model
                 && !MapModel.Map[newX, newY].Structure.IsFreeCell())
                 return new StructureCommand { };
             return new StructureCommand { DeltaX = newX - x, DeltaY = newY - y };
+        }
+
+        public StructureCommand BattleModAct(int x, int y, int newX, int newY)
+        {
+            if (WayToCell.Count != 0)
+            {
+                var point = WayToCell.Dequeue();
+                if (point.X - x == 1 || point.Y - y == 1)
+                {
+                    WayToCell = new Queue<Point>();
+                    return new StructureCommand { DeltaX = 0, DeltaY = 0 };
+                }
+                Endurance -= WalkCost;
+                Coordinates = new Point(point.X, point.Y);
+                MapModel.PlayerCoordinates = new Point(point.X, point.Y);
+                if (Endurance <= 0)
+                    GameState.IsPlayerTurn = false;
+                return new StructureCommand { DeltaX = point.X - x, DeltaY = point.Y - y };
+            }
+            else if (MapModel.PointClick != new Point(-1, -1))
+            {
+                MapModel.PointClick = new Point(-1, -1);
+                if (MapModel.Map[newX, newY].Structure != null &&
+                    MapModel.Map[newX, newY].Structure.GetImageFileName() == "Enemy.png")
+                {
+                    MapModel.Map[newX, newY].Structure.GetAttaced(Damage);
+                    Endurance -= AttackCost;
+                    if (Endurance <= 0)
+                        GameState.IsPlayerTurn = false;
+                    return new StructureCommand { DeltaX = 0, DeltaY = 0 };
+                }
+                else if (MapModel.Map[newX, newY].Structure == null ||
+                    MapModel.Map[newX, newY].Structure.IsFreeCell())
+                {
+                    WayToCell = FindPaths(new Point(x, y), new Point[] { new Point(newX, newY) });
+                    if (WayToCell.Count == 0)
+                        return new StructureCommand { DeltaX = 0, DeltaY = 0 };
+                    var point = WayToCell.Dequeue();
+                    Endurance -= WalkCost;
+                    if (Endurance <= 0)
+                        GameState.IsPlayerTurn = false;
+                    Coordinates = new Point(point.X, point.Y);
+                    MapModel.PlayerCoordinates = new Point(point.X, point.Y);
+                    return new StructureCommand { DeltaX = point.X - x, DeltaY = point.Y - y };
+                }
+
+            }
+            return new StructureCommand { DeltaX = 0, DeltaY = 0 };
         }
 
         public int GetDrawingPriority()
@@ -115,12 +148,13 @@ namespace Game.Model
 
         public void GetAttaced(int damage)
         {
-            throw new NotImplementedException();
+            Health -= damage;
         }
     }
 
     class Wall : IStructure
     {
+        public Point Coordinates { get; set; }
         public StructureCommand Act(int x, int y)
         {
             return new StructureCommand { };
@@ -150,6 +184,7 @@ namespace Game.Model
 
     class Empty : IStructure
     {
+        public Point Coordinates { get; set; }
         public StructureCommand Act(int x, int y)
         {
             return new StructureCommand { };
@@ -175,13 +210,79 @@ namespace Game.Model
             return true;
         }
     }
-    class Enemy : IStructure
+    public class Enemy : IStructure
     {
+        public Point Coordinates { get; set; }
         public int Health = 15;
+        public int Endurance = 3;
+        public int Damage = 5;
+        public int WalkCost = 1;
+        public int AttackCost = 1;
+        int xPlayer;
+        int yPlayer;
+
+        public bool FindPlayer()
+        {
+            for (var i = 0; i < MapModel.MapHeight; i++)
+            {
+                for (var j = 0; j < MapModel.MapWidth; j++)
+                {
+                    if (MapModel.Map[j, i].Structure is Player)
+                    {
+                        xPlayer = j;
+                        yPlayer = i;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public bool CanMove(int x, int y)
+        {
+            if (MapModel.Map[x, y].Structure == null)
+                return true;
+            var map = MapModel.Map[x, y];
+            return !(x >= MapModel.MapWidth || x < 0 || y >= MapModel.MapHeight || y < 0 ||
+                !map.Structure.IsFreeCell());
+        }
+
         public StructureCommand Act(int x, int y)
         {
             if (Health == 0)
-                MapModel.Map[x, y].Structure = new Empty(); 
+                MapModel.Map[x, y].Structure = new Empty();
+            if (Endurance <=0)
+            {
+                Endurance = 3;
+                GameState.IsPlayerTurn = true;
+                return new StructureCommand() { };
+            }
+            if (!FindPlayer())
+                return new StructureCommand() { };
+            if (GameState.IsBattleModOn )
+            {
+                if (GameState.IsPlayerTurn)
+                    return new StructureCommand { DeltaX = 0, DeltaY = 0 };
+                var newX = 0;
+                var newY = 0;
+                //var xPlayer = MapModel.PlayerCoordinates.X;
+                //var yPlayer = MapModel.PlayerCoordinates.Y;
+                if (Math.Abs(x - xPlayer) == 1 || Math.Abs(y - yPlayer) == 1)
+                {
+                    MapModel.Map[xPlayer, yPlayer].Structure.GetAttaced(Damage);
+                    Endurance -= AttackCost;
+                    return new StructureCommand { DeltaX = 0, DeltaY = 0 };
+                }
+                if (x < xPlayer && CanMove(x + 1, y))
+                    newX = 1;
+                else if (x > xPlayer && CanMove(x - 1, y))
+                    newX = -1;
+                else if (y < yPlayer && CanMove(x, y + 1))
+                    newY = 1;
+                else if (y > yPlayer && CanMove(x, y - 1))
+                    newY = -1;
+                Endurance -= WalkCost;
+                return new StructureCommand { DeltaX = newX, DeltaY = newY };
+            }
             return new StructureCommand { DeltaX = 0, DeltaY = 0 };
         }
 

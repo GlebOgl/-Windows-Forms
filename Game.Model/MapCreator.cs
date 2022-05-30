@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -19,7 +20,12 @@ namespace Game.Model
             var result = new IStructure[rows[0].Length, rows.Length];
             for (var x = 0; x < rows[0].Length; x++)
                 for (var y = 0; y < rows.Length; y++)
+                {
                     result[x, y] = CreateStructureBySymbol(rows[y][x]);
+                    if (rows[y][x] == 'P')
+                        MapModel.PlayerCoordinates = new Point(x, y);
+                    result[x, y].Coordinates = new Point(x,y);
+                }
             return result;
         }
 

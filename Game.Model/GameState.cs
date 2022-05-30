@@ -12,32 +12,111 @@ namespace Game.Model
     {
         public const int ElementSize = 32;
         public List<StructureAnimation> Animations = new List<StructureAnimation>();
-
+        public static bool IsBattleModOn = false;
+        public static bool IsPlayerTurn = false;
+        public static List<Enemy> EnemiesMoves = new List<Enemy>(); 
         public void BeginAct()
         {
             Animations.Clear();
-            for (var x = 0; x < MapModel.MapWidth; x++)
-                for (var y = 0; y < MapModel.MapHeight; y++)
-                {
-                    var cell = MapModel.Map[x, y];
-                    if (cell == null || cell.Structure == null) continue;
-                    var command = cell.Structure.Act(x, y);
+            //if (IsBattleModOn)
+            //{
+            //    if (IsPlayerTurn)
+            //    {
+            //        var x = MapModel.PlayerCoordinates.X;
+            //        var y = MapModel.PlayerCoordinates.Y;
+            //        var player = (Player)MapModel.Map[x, y].Structure;
+            //        if (player.Endurance <= 0)
+            //        {
+            //            player.Endurance = 5;
+            //            IsPlayerTurn = false;
+            //        }
+            //        else
+            //        {
+            //            var cell = MapModel.Map[x, y];
+            //            var command = player.Act(x, y);
+            //            Animations.Add(
+            //                new StructureAnimation
+            //                {
+            //                    Command = command,
+            //                    Structure = cell.Structure,
+            //                    Location = new Point(x * ElementSize, y * ElementSize),
+            //                    TargetLogicalLocation = new Point(x + command.DeltaX, y + command.DeltaY)
+            //                });
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (EnemiesMoves.Count == 0)
+            //            EnemiesMoves = FindNearestEnemies(4);
+            //        else
+            //        {
+            //            foreach (var e in EnemiesMoves)
+            //            {
+            //                while(e.Endurance > 0)
+            //                {
+            //                    var x = e.Coordinates.X;
+            //                    var y = e.Coordinates.Y;
+            //                    var cell = MapModel.Map[x, y];
+            //                    var command = e.Act(x, y);
+            //                    Animations.Add(
+            //                    new StructureAnimation
+            //                    {
+            //                        Command = command,
+            //                        Structure = cell.Structure,
+            //                        Location = new Point(x * ElementSize, y * ElementSize),
+            //                        TargetLogicalLocation = new Point(x + command.DeltaX, y + command.DeltaY)
+            //                    });
+            //                }
+            //                e.Endurance = 3;
+            //            }
+            //            EnemiesMoves = new List<Enemy>();
+            //            IsPlayerTurn = true;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+                for (var x = 0; x < MapModel.MapWidth; x++)
+                    for (var y = 0; y < MapModel.MapHeight; y++)
+                    {
+                        var cell = MapModel.Map[x, y];
+                        if (cell == null || cell.Structure == null) continue;
+                        var command = cell.Structure.Act(x, y);
 
-                    if (x + command.DeltaX < 0 || x + command.DeltaX >= MapModel.MapWidth || y + command.DeltaY < 0 ||
-                        y + command.DeltaY >= MapModel.MapHeight)
-                        throw new Exception($"The object {cell.GetType()} falls out of the game field");
+                        if (x + command.DeltaX < 0 || x + command.DeltaX >= MapModel.MapWidth || y + command.DeltaY < 0 ||
+                            y + command.DeltaY >= MapModel.MapHeight)
+                            throw new Exception($"The object {cell.GetType()} falls out of the game field");
 
-                    Animations.Add(
-                        new StructureAnimation
-                        {
-                            Command = command,
-                            Structure = cell.Structure,
-                            Location = new Point(x * ElementSize, y * ElementSize),
-                            TargetLogicalLocation = new Point(x + command.DeltaX, y + command.DeltaY)
-                        });
-                }
+                        Animations.Add(
+                            new StructureAnimation
+                            {
+                                Command = command,
+                                Structure = cell.Structure,
+                                Location = new Point(x * ElementSize, y * ElementSize),
+                                TargetLogicalLocation = new Point(x + command.DeltaX, y + command.DeltaY)
+                            });
+                    }
+            //}
 
             Animations = Animations.OrderByDescending(z => z.Structure.GetDrawingPriority()).ToList();
+        }
+
+        public List<Enemy> FindNearestEnemies(int n)
+        {
+            var x = MapModel.PlayerCoordinates.X;
+            var y = MapModel.PlayerCoordinates.Y;
+            var result = new List<Enemy>();
+            for (var i = -n; i<n;i++)
+                for (var j = -n; j<n;j++)
+                {
+                    if (i==0 && j==0 || x + i < 0 || x + i >= MapModel.MapWidth
+                        || y + j < 0 || y + j >= MapModel.MapHeight)
+                        continue;
+                    if (MapModel.Map[x + i, y + j].Structure != null && 
+                        MapModel.Map[x + i, y + j].Structure.GetImageFileName() == "Enemy.png")
+                        result.Add((Enemy)MapModel.Map[x + i, y + j].Structure);
+                }
+            return result;
         }
 
         public void EndAct()

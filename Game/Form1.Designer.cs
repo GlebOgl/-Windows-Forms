@@ -40,14 +40,15 @@ namespace Game
             ClientSize = new Size(
                 GameState.ElementSize * MapModel.MapWidth,
                 GameState.ElementSize * MapModel.MapHeight + GameState.ElementSize);
-            //var button = new Button
-            //{
-            //    Location = new Point(0,
-            //    GameState.ElementSize * MapModel.MapHeight),
-            //    Size = new Size(GameState.ElementSize * MapModel.MapWidth, GameState.ElementSize),
-            //    Text = "Пошаговый режим"
-            //};
-            //Controls.Add(button);
+            var button = new Button
+            {
+                Location = new Point(0,
+                GameState.ElementSize * MapModel.MapHeight),
+                Size = new Size(GameState.ElementSize * MapModel.MapWidth, GameState.ElementSize),
+                Text = "Пошаговый режим OFF"
+            };
+            Controls.Add(button);
+            button.Click += BattleModEnable;
             //for (var i = 0; i<MapModel.MapWidth;i++)
             //    for (var j = 0; j<MapModel.MapHeight;j++)
             //    {
@@ -69,6 +70,23 @@ namespace Game
             timer.Interval = 15;
             timer.Tick += TimerTick;
             timer.Start();
+        }
+
+        private void BattleModEnable(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            if (GameState.IsBattleModOn)
+            {
+                GameState.IsBattleModOn = false;
+                GameState.IsPlayerTurn = false;
+                b.Text = ("Пошаговый режим OFF");
+            }
+            else
+            {
+                GameState.IsBattleModOn = true;
+                GameState.IsPlayerTurn = true;
+                b.Text = ("Пошаговый режим ON");
+            }
         }
 
         private void MouseClickOnCell(object sender, MouseEventArgs e)
