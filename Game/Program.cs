@@ -17,7 +17,14 @@ namespace Map
         private static void Main()
         {
             MapModel.CreateMap();
+            Application.Run(new FirstWindow());
             Application.Run(new GameWindow());
+            if (GameState.IsPlayerWon)
+            {
+                Application.Exit();
+                Application.Run(new WinWindow());
+            }
+            
         }
     }
 }

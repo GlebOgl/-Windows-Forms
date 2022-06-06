@@ -12,13 +12,30 @@ namespace Game.Model
     public static class MapModel
     {
         private const string mapWithPlayerWall = @"
-    W
-W P W
-W  EW
-WW EW";
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WE           E   E          EW
+W                            W
+W        E          E        W
+WWWWWW WWW          WWWW WWWWW
+W        W    E E   WE      EW
+W        W     E    W        W
+WE      EW          W        W
+WWWWWWWWWW          WWWWWWWWWW
+WWWWWE        WWW       EWWWWW
+WWWWW         WWW        WWWWW
+WWWWWE                  EWWWWW
+WWWWWWWWWW WWWWWWWWWWW WWWWWWW
+WE            E E          E W
+WWW W W                WWWWWWW
+W         WWWW WWWWW       E W
+W   WWWW  W   E    W     WWWWW
+W   WE W EW        W    E   WW
+W      WWWW   CP   WW       WW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
         public static Cell[,] Map;
         public static Point PointClick = new Point(-1,-1);
         public static Point PlayerCoordinates;
+        public static Point CloneCoordinates;
         public static int MapWidth => Map.GetLength(0);
         public static int MapHeight => Map.GetLength(1);
         public static Keys KeyPressed;

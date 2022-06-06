@@ -12,8 +12,14 @@ namespace Game.Model
     {
         public const int ElementSize = 32;
         public List<StructureAnimation> Animations = new List<StructureAnimation>();
-        public static bool IsBattleModOn = false;
-        public static bool IsPlayerTurn = false;
+        public static bool IsBattleModOn = true;
+        public static bool IsPlayerAlive = false;
+        public static bool IsPlayerTurn = true;
+        public static bool IsPlayerWon = false;
+        public static int PlayerHealth;
+        public static int PlayerEndurance;
+        public static int PlayerRange;
+        public static int PlayerDamage;
         public static List<Enemy> EnemiesMoves = new List<Enemy>(); 
         public void BeginAct()
         {

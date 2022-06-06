@@ -12,6 +12,11 @@ namespace Game.Model
     {
         private static readonly Dictionary<string, Func<IStructure>> factory = new Dictionary<string, Func<IStructure>>();
 
+        public static int Endurance;
+        public static int MaxHealth;
+        public static int Dexterity;
+        public static int Strength;
+
         public static IStructure[,] CreateMap(string map, string separator = "\r\n")
         {
             var rows = map.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
@@ -24,6 +29,8 @@ namespace Game.Model
                     result[x, y] = CreateStructureBySymbol(rows[y][x]);
                     if (rows[y][x] == 'P')
                         MapModel.PlayerCoordinates = new Point(x, y);
+                    if (rows[y][x] == 'C')
+                        MapModel.CloneCoordinates = new Point(x, y);
                     result[x, y].Coordinates = new Point(x,y);
                 }
             return result;
@@ -45,6 +52,11 @@ namespace Game.Model
             return factory[name]();
         }
 
+        //private static IStructure CreatePlayer()
+        //{
+        //    GameState.IsPlayerAlive = true;
+        //    return new Player(Dexterity, Strength, MaxHealth, Endurance);
+        //}
 
         private static IStructure CreateStructureBySymbol(char c)
         {
@@ -52,6 +64,12 @@ namespace Game.Model
             {
                 case 'P':
                     return CreateStructureByTypeName("Player");
+                case 'R':
+                    return CreateStructureByTypeName("RPistol");
+                case 'S':
+                    return CreateStructureByTypeName("Shotgun");
+                case 'C':
+                    return CreateStructureByTypeName("CloneMachine");
                 case 'W':
                     return CreateStructureByTypeName("Wall");
                 case ' ':

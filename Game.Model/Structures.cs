@@ -11,24 +11,65 @@ namespace Game.Model
     class Player : IStructure
     {
         public Point Coordinates { get; set; }
+        //private Func<int, int, int> DamageCalculation = new Func<int, int, int>((d, s) => s * 2);
         public int Health = 20;
         public int Endurance = 5;
-        public int Damage = 5;
+        private int Damage = 5;
+        private int AtackRange = 3;
         public int WalkCost = 1;
-        public int AttackCost = 1;
+        private int AttackCost = 1;
+        //private int MaxHealth;
+        //private int Dexterity;
+        //private int Strength;
+        //private int MaxEndurance = 3;
+
         private Queue<Point> WayToCell = new Queue<Point>();
+
+        //public Player(int dexterity, int strength, int maxHealth, int endurance)
+        //{
+        //    Dexterity = dexterity;
+        //    Strength = strength;
+        //    Endurance = endurance;
+        //    MaxHealth = maxHealth;
+        //    Health = MaxHealth;
+        //    GameState.PlayerHealth = MaxHealth;
+        //    DamageCalculation = new Func<int, int, int>((d, s) => s * 2);
+        //}
 
         public StructureCommand Act(int x, int y)
         {
-            if (Health <=0)
+            //Damage = DamageCalculation(Dexterity, Strength);
+            GameState.PlayerHealth = Health;
+            GameState.PlayerDamage = Damage;
+            GameState.PlayerEndurance = Endurance;
+            GameState.PlayerRange = AtackRange;
+            if (Health <= 0)
+            { 
                 MapModel.Map[x, y].Structure = new Empty();
+                MapModel.Map[MapModel.CloneCoordinates.X + 1, MapModel.CloneCoordinates.Y].Structure = new Player();
+
+            }
             var newX = MapModel.PointClick.X / GameState.ElementSize;
             var newY = MapModel.PointClick.Y / GameState.ElementSize;
+            //if (MapModel.Map[newX, newY].Structure is RPistol 
+            //    && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
+            //{
+            //    Damage = 6;
+            //    AtackRange = 5;
+            //}
+            //if (MapModel.Map[newX, newY].Structure is Shotgun
+            //    && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
+            //{
+            //    Damage = 15;
+            //    AtackRange = 3;
+            //    AttackCost = 2;
+            //}
             if (GameState.IsBattleModOn && GameState.IsPlayerTurn)
             {
                 return BattleModAct(x, y, newX, newY);
             }
             Endurance = 5;
+            GameState.IsPlayerTurn = true;
             newX = x;
             newY = y;
             if (MapModel.KeyPressed == Keys.Up)
@@ -67,7 +108,8 @@ namespace Game.Model
             {
                 MapModel.PointClick = new Point(-1, -1);
                 if (MapModel.Map[newX, newY].Structure != null &&
-                    MapModel.Map[newX, newY].Structure.GetImageFileName() == "Enemy.png")
+                    MapModel.Map[newX, newY].Structure.GetImageFileName() == "Enemy.png" &&
+                    (Math.Abs(newX - x) <= AtackRange && Math.Abs(newY - y) <= AtackRange))
                 {
                     MapModel.Map[newX, newY].Structure.GetAttaced(Damage);
                     Endurance -= AttackCost;
@@ -149,6 +191,7 @@ namespace Game.Model
         public void GetAttaced(int damage)
         {
             Health -= damage;
+            GameState.PlayerHealth = Health;
         }
     }
 
@@ -210,6 +253,37 @@ namespace Game.Model
             return true;
         }
     }
+
+    public class CloneMachine : IStructure
+    {
+        public Point Coordinates { get; set; }
+
+        public StructureCommand Act(int x, int y)
+        {
+            return new StructureCommand { };
+        }
+
+        public void GetAttaced(int damage)
+        {
+            
+        }
+
+        public int GetDrawingPriority()
+        {
+            return 1000;
+        }
+
+        public string GetImageFileName()
+        {
+            return "Clone.png";
+        }
+
+        public bool IsFreeCell()
+        {
+            return false;
+        }
+    }
+
     public class Enemy : IStructure
     {
         public Point Coordinates { get; set; }
@@ -237,6 +311,20 @@ namespace Game.Model
             }
             return false;
         }
+
+        public bool FindEnemy()
+        {
+            for (var i = 0; i < MapModel.MapHeight; i++)
+            {
+                for (var j = 0; j < MapModel.MapWidth; j++)
+                {
+                    if (MapModel.Map[j, i].Structure is Enemy)
+                        return true;
+                }
+            }
+            return false;
+        }
+
         public bool CanMove(int x, int y)
         {
             if (MapModel.Map[x, y].Structure == null)
@@ -249,7 +337,15 @@ namespace Game.Model
         public StructureCommand Act(int x, int y)
         {
             if (Health == 0)
+            {
                 MapModel.Map[x, y].Structure = new Empty();
+                if (!FindEnemy())
+                    GameState.IsPlayerWon = true;
+                return new StructureCommand();
+            }
+            if (Math.Abs(MapModel.PlayerCoordinates.X - x) > 5 ||
+                Math.Abs(MapModel.PlayerCoordinates.Y - y) > 5)
+                return new StructureCommand { };
             if (Endurance <=0)
             {
                 Endurance = 3;
@@ -266,7 +362,7 @@ namespace Game.Model
                 var newY = 0;
                 //var xPlayer = MapModel.PlayerCoordinates.X;
                 //var yPlayer = MapModel.PlayerCoordinates.Y;
-                if (Math.Abs(x - xPlayer) == 1 || Math.Abs(y - yPlayer) == 1)
+                if (Math.Abs(x - xPlayer) <= 1 && Math.Abs(y - yPlayer) <= 1 )
                 {
                     MapModel.Map[xPlayer, yPlayer].Structure.GetAttaced(Damage);
                     Endurance -= AttackCost;
@@ -307,4 +403,65 @@ namespace Game.Model
         }
     }
 
+    public class RPistol : IStructure
+    {
+        public Point Coordinates { get ; set ; }
+
+        public StructureCommand Act(int x, int y)
+        {
+            Coordinates = new Point(x, y);
+            return new StructureCommand();
+        }
+
+        public void GetAttaced(int damage)
+        {
+            
+        }
+
+        public int GetDrawingPriority()
+        {
+            return 20;
+        }
+
+        public string GetImageFileName()
+        {
+            return "Pistol.png";
+        }
+
+        public bool IsFreeCell()
+        {
+            return false;
+        }
+    }
+
+    public class Shotgun : IStructure
+    {
+        public Point Coordinates { get; set; }
+
+        public StructureCommand Act(int x, int y)
+        {
+            Coordinates = new Point(x, y);
+            return new StructureCommand();
+        }
+
+        public void GetAttaced(int damage)
+        {
+
+        }
+
+        public int GetDrawingPriority()
+        {
+            return 20;
+        }
+
+        public string GetImageFileName()
+        {
+            return "Shotgan.png";
+        }
+
+        public bool IsFreeCell()
+        {
+            return false;
+        }
+    }
 }
