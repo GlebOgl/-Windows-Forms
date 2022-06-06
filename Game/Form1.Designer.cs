@@ -39,8 +39,8 @@ namespace Game
         {
             e.Graphics.FillRectangle(
                 Brushes.Gray, 0, 0, 700, 350);
-            e.Graphics.DrawString("Вам нужно спасти \n убежище и его жителей \n" +
-                "от захватчиков \n чтоби ходить и бить нажимайте \n мышью на врагов и клетки", new Font("Arial", 24), Brushes.Black, 0, 125);
+            e.Graphics.DrawString(" Вам нужно спасти \n убежище и его жителей \n" +
+                " от захватчиков \n чтоби ходить и бить \n и поднимать оружие нажимайте \n мышью на врагов и клетки", new Font("Arial", 24), Brushes.Black, 0, 125);
             
         }
     }
