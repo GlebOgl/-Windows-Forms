@@ -23,14 +23,14 @@ WE      EW          W        W
 WWWWWWWWWW          WWWWWWWWWW
 WWWWWE        WWW       EWWWWW
 WWWWW         WWW        WWWWW
-WWWWWE                  EWWWWW
+WWWWWE         S        EWWWWW
 WWWWWWWWWW WWWWWWWWWWW WWWWWWW
 WE            E E          E W
 WWW W W                WWWWWWW
 W         WWWW WWWWW       E W
 W   WWWW  W   E    W     WWWWW
 W   WE W EW        W    E   WW
-W      WWWW   CP   WW       WW
+W      WWWW   CP   WW      RWW
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
         public static Cell[,] Map;
         public static Point PointClick = new Point(-1,-1);

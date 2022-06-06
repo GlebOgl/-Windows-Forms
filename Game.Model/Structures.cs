@@ -14,10 +14,11 @@ namespace Game.Model
         //private Func<int, int, int> DamageCalculation = new Func<int, int, int>((d, s) => s * 2);
         public int Health = 20;
         public int Endurance = 5;
-        private int Damage = 5;
-        private int AtackRange = 3;
+        private int Damage = 3;
+        private int AtackRange = 1;
         public int WalkCost = 1;
         private int AttackCost = 1;
+        private string Weapon = "Fist";
         //private int MaxHealth;
         //private int Dexterity;
         //private int Strength;
@@ -51,19 +52,20 @@ namespace Game.Model
             }
             var newX = MapModel.PointClick.X / GameState.ElementSize;
             var newY = MapModel.PointClick.Y / GameState.ElementSize;
-            //if (MapModel.Map[newX, newY].Structure is RPistol 
-            //    && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
-            //{
-            //    Damage = 6;
-            //    AtackRange = 5;
-            //}
-            //if (MapModel.Map[newX, newY].Structure is Shotgun
-            //    && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
-            //{
-            //    Damage = 15;
-            //    AtackRange = 3;
-            //    AttackCost = 2;
-            //}
+            if (MapModel.Map[newX, newY].Structure is RPistol
+                && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
+            {
+                Weapon = "Pistol";
+                Damage = 5;
+                AtackRange = 5;
+            }
+            if (MapModel.Map[newX, newY].Structure is Shotgun
+                && Math.Abs(x - newX) <= 1 && Math.Abs(y - newY) <= 1)
+            {
+                Weapon = "Shotgun";
+                Damage = 10;
+                AtackRange = 3;
+            }
             if (GameState.IsBattleModOn && GameState.IsPlayerTurn)
             {
                 return BattleModAct(x, y, newX, newY);
@@ -112,6 +114,12 @@ namespace Game.Model
                     (Math.Abs(newX - x) <= AtackRange && Math.Abs(newY - y) <= AtackRange))
                 {
                     MapModel.Map[newX, newY].Structure.GetAttaced(Damage);
+                    //if (Weapon == "Fist")
+                    //    MapModel.Map[newX, newY].Structure.GetAttaced(Damage);
+                    //else if (Weapon == "Pistol")
+                    //    MapModel.Map[newX, newY].Structure.GetAttaced(5);
+                    //else if (Weapon == "Shotgun")
+                    //    MapModel.Map[newX, newY].Structure.GetAttaced(10);
                     Endurance -= AttackCost;
                     if (Endurance <= 0)
                         GameState.IsPlayerTurn = false;
@@ -336,7 +344,7 @@ namespace Game.Model
 
         public StructureCommand Act(int x, int y)
         {
-            if (Health == 0)
+            if (Health <= 0)
             {
                 MapModel.Map[x, y].Structure = new Empty();
                 if (!FindEnemy())
@@ -456,7 +464,7 @@ namespace Game.Model
 
         public string GetImageFileName()
         {
-            return "Shotgan.png";
+            return "Shotgun.png";
         }
 
         public bool IsFreeCell()
